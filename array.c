@@ -1,4 +1,4 @@
-#include "json_structures.h"
+#include "json.h"
 
 #include <stdbool.h>
 #include <stdio.h>

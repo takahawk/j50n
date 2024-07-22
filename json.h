@@ -1,5 +1,5 @@
-#ifndef JSON_STRUCTURES_H_
-#define JSON_STRUCTURES_H_
+#ifndef JSON_H_
+#define JSON_H_
 #include <stdbool.h>
 
 #include "d4t4-5tructur35/array_list.h"
@@ -76,4 +76,11 @@ JO_GetString(char*, JSONObject);
 bool
 JO_GetBoolean(char*, JSONObject);
 
+
+// parse functions
+JSONObject*
+ParseJSONObject(Buffer);
+
+JSONArray*
+ParseJSONArray(Buffer);
 #endif

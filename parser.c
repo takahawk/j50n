@@ -1,10 +1,7 @@
-#include "json_parser.h"
+#include "json.h"
 
 #include <stddef.h>
 #include <stdio.h>
-
-#include "json_array.h"
-#include "json_object.h"
 
 JSONObject*
 ParseJSONObject(Buffer buffer) {
