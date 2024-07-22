@@ -4,13 +4,13 @@
 struct _JSONArray;
 
 typedef struct _JSONObject {
-	SkikListMap slm;
+	SkipListMap slm;
 } JSONObject;
 
 JSONObject
 JO_GetObject(char*, JSONObject);
 
-_JSONArray
+struct _JSONArray
 JO_GetArray(char*, JSONObject);
 
 int

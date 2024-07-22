@@ -1,5 +1,7 @@
 #ifndef JSON_ARRAY_H_
 #define JSON_ARRAY_H_
+#include <stdbool.h>
+
 #include "d4t4-5tructur35/array_list.h"
 
 struct _JSONObject;
