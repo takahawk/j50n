@@ -7,7 +7,10 @@ JSONObject*
 ParseJSONObject(Buffer buffer) {
 	char *str = buffer.data;
 	size_t len = buffer.len;
-	enum {START, OBJECT, FIELD_NAME } state = START;
+	enum {START, OBJECT, KEY, COLON } state = START;
+
+	size_t mark = 0;
+	Buffer key;
 
 	for (int i = 0; i < len; i++) {
 		switch (state) {
@@ -23,7 +26,7 @@ ParseJSONObject(Buffer buffer) {
 			default:
 				// TODO: error handling!
 				fprintf(stderr, "Unexpected symbol in the beginning: %c\n", str[i]);
-				return NULL;
+				goto end;
 			}
 
 		case OBJECT:
@@ -34,17 +37,38 @@ ParseJSONObject(Buffer buffer) {
 				continue;
 			case '"':
 				state = FIELD_NAME;
+				mark = i + 1;
 				continue;
 			default:
 				fprintf(stderr, "Unexpected symbol: %c; expected \"\n", str[i]);
-				return NULL;
+				goto end;
 			}
 
-		case FIELD_NAME:
+		case KEY:
 			switch (str[i]) {
+			case '\n':
+				fprintf(stderr, "Unexpected newline inside quotes\n");
+				goto end;
+			case '"':
+				key = AsBuffer(str + mark, i - mark);
+				state = COLON;
+				// FALLTHROUGH
+			default:
+				continue;
+			}
+		case COLON:
+			switch (str[i]) {
+			case ' ':
+			case '\t':
+			case '\n':
+				continue;
+			case ':':
+				// TODO:
 			}
 		}
 	}
+
+end:
 }
 
 JSONArray*
