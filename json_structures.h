@@ -17,18 +17,6 @@ typedef enum {
 
 
 typedef struct {
-	JSONFieldType type;
-	union {
-		int integer;
-		char *str;
-		float floating;
-		bool boolean;
-		struct _JSONObject* object;
-		struct _JSONArray* array;
-	};
-} JSONField;
-
-typedef struct {
 	SkipListMap slm;
 } JSONObject;
 
@@ -36,7 +24,23 @@ typedef struct {
 	ArrayList al;
 } JSONArray;
 
+typedef struct {
+	JSONFieldType type;
+	union {
+		int integer;
+		char *str;
+		float floating;
+		bool boolean;
+		JSONObject object;
+		JSONArray array;
+	};
+} JSONField;
+
 // array getters
+
+JSONField
+JA_GetField(int, JSONArray);
+
 JSONObject
 JA_GetObject(int, JSONArray);
 
@@ -54,6 +58,9 @@ JA_GetBoolean(int, JSONArray);
 
 
 // object getters
+JSONField
+JO_GetField(char*, JSONObject);
+
 JSONObject
 JO_GetObject(char*, JSONObject);
 
