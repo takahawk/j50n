@@ -1,6 +1,9 @@
 #ifndef JSON_OBJECT_H_
 #define JSON_OBJECT_H_
+#include <stdbool.h>
+
 #include "d4t4-5tructur35/skip_list_map.h"
+
 struct _JSONArray;
 
 typedef struct _JSONObject {
