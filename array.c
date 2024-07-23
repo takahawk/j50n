@@ -5,6 +5,15 @@
 
 #include "d4t4-5tructur35/array_list.h"
 
+#define AL_INITIAL_CAPACITY 10
+
+JSONArray
+AllocJSONArray() {
+	JSONArray a;
+	a.al = AllocArrayList(sizeof(JSONValue), AL_INITIAL_CAPACITY);
+	return a;
+}
+
 JSONValue
 JA_GetValue(int i, JSONArray a) {
 	void* data = AL_Get(&a.al, i);
@@ -77,4 +86,10 @@ JA_GetBoolean(int i, JSONArray a) {
 	}
 
 	return value.boolean;
+}
+
+void
+FreeJSONArray(JSONArray* a) {
+	FreeArrayList(&a->al);
+	// TODO: implement recursive freeing of inner objects and arrays
 }

@@ -8,6 +8,13 @@
 #include "d4t4-5tructur35/buffer.h"
 #include "d4t4-5tructur35/skip_list_map.h"
 
+JSONObject
+AllocJSONObject() {
+	JSONObject o;
+	o.slm = SLM_Create();
+	return o;
+}
+
 JSONValue
 JO_GetValue(char* key, JSONObject o) {
 	size_t keylen = strlen(key);
@@ -81,4 +88,10 @@ JO_GetBoolean(char* key, JSONObject o) {
 	}
 
 	return value.boolean;
+}
+
+void
+FreeJSONObject(JSONObject *o) {
+	SLM_Free(&o->slm);
+	// TODO: implement recursive freeing of inner objects and arrays
 }
