@@ -8,8 +8,8 @@
 #include "d4t4-5tructur35/buffer.h"
 #include "d4t4-5tructur35/skip_list_map.h"
 
-JSONObject*
-ParseJSONObject(Buffer buffer) {
+JSONValue*
+ParseJSON(Buffer buffer) {
 	char *str = buffer.data;
 	size_t len = buffer.len;
 	enum {
@@ -123,8 +123,5 @@ ParseJSONObject(Buffer buffer) {
 	}
 
 end:
-}
-
-JSONArray*
-ParseJSONArray(Buffer) {
+	return NULL;
 }

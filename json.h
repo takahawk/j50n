@@ -13,7 +13,7 @@ typedef enum {
 	JSON_OBJECT,
 	JSON_ARRAY,
 	JSON_NULL
-} JSONFieldType;
+} JSONValueType;
 
 
 typedef struct {
@@ -25,7 +25,7 @@ typedef struct {
 } JSONArray;
 
 typedef struct {
-	JSONFieldType type;
+	JSONValueType type;
 	union {
 		int integer;
 		char *str;
@@ -34,12 +34,12 @@ typedef struct {
 		JSONObject object;
 		JSONArray array;
 	};
-} JSONField;
+} JSONValue;
 
 // array getters
 
-JSONField
-JA_GetField(int, JSONArray);
+JSONValue
+JA_GetValue(int, JSONArray);
 
 JSONObject
 JA_GetObject(int, JSONArray);
@@ -58,8 +58,8 @@ JA_GetBoolean(int, JSONArray);
 
 
 // object getters
-JSONField
-JO_GetField(char*, JSONObject);
+JSONValue
+JO_GetValue(char*, JSONObject);
 
 JSONObject
 JO_GetObject(char*, JSONObject);
@@ -78,9 +78,6 @@ JO_GetBoolean(char*, JSONObject);
 
 
 // parse functions
-JSONObject*
-ParseJSONObject(Buffer);
-
-JSONArray*
-ParseJSONArray(Buffer);
+JSONValue*
+ParseJSON(Buffer);
 #endif
