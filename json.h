@@ -87,6 +87,9 @@ JO_GetBoolean(char*, JSONObject);
 void
 FreeJSONObject(JSONObject*);
 
+// value functions
+void
+FreeJSONValue(JSONValue*);
 
 // parse functions
 int

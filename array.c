@@ -16,7 +16,7 @@ AllocJSONArray() {
 
 JSONValue
 JA_GetValue(int i, JSONArray a) {
-	void* data = AL_Get(&a.al, i);
+	void* data = AL_Get(a.al, i);
 	return *((JSONValue *) data);
 }
 
@@ -88,8 +88,15 @@ JA_GetBoolean(int i, JSONArray a) {
 	return value.boolean;
 }
 
+static void
+_FreeJSONArrayElem(void *elem) {
+	JSONValue *value = ((JSONValue*) elem);
+	FreeJSONValue(value);
+}
+
 void
 FreeJSONArray(JSONArray* a) {
+	AL_Iterate(a->al, _FreeJSONArrayElem);
 	FreeArrayList(&a->al);
 	// TODO: implement recursive freeing of inner objects and arrays
 }

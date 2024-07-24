@@ -90,8 +90,14 @@ JO_GetBoolean(char* key, JSONObject o) {
 	return value.boolean;
 }
 
+static void
+_FreeObjectField(Buffer key, Buffer value) {
+	JSONValue *jsonValue = ((JSONValue*) value.data);
+	FreeJSONValue(jsonValue);
+}
+
 void
 FreeJSONObject(JSONObject *o) {
+	SLM_Iterate(o->slm, _FreeObjectField);
 	SLM_Free(&o->slm);
-	// TODO: implement recursive freeing of inner objects and arrays
 }
