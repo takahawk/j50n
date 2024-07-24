@@ -1,6 +1,7 @@
 #include "json.h"
 
 #include <ctype.h>
+#include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,6 +25,79 @@ _Pop(ArrayList *stack) {
 	JSONValue value = _Peek(*stack);
 	AL_RemoveAt(stack, stack->len - 1);
 	return value;
+}
+
+static inline bool
+_isInteger(char *str, size_t len) {
+	if (len == 0)
+		return false;
+	int i = 0;
+	if (str[0] == '-')
+		i++;
+
+	for (; i < len; i++)
+		if (!isdigit(str[i]))
+			return false;
+
+	return true;
+}
+
+static inline int
+_ParseInt(char *str, int len) {
+	int result = 0;
+	for (int i = 0; i < len; i++) {
+		// we assume that check is already done and we have correct
+		// value here
+		result *= 10;
+		result += str[i] - 48;
+	}
+
+	return result;
+}
+
+static inline bool
+_isFloating(char *str, size_t len) {
+	// TODO: e notation
+	bool dotFound = false;
+	int i = 0;
+	if (str[0] == '-')
+		i++;
+	for (; i < len; i++) {
+		if (str[i] == '.') {
+			if (dotFound)
+				return false;
+			dotFound = true;
+		}
+		if (!isdigit(str[i]))
+			return false;
+	}
+
+	return true;
+}
+
+static inline float
+_ParseFloat(char *str, size_t len) {
+	int intPart = 0, fractPart = 0;
+	
+	size_t i = 0;
+
+	for (; i < len; i++) {
+		// we assume that check is already done and we have correct
+		// value here
+		if (str[i] == '.')
+			break;
+		intPart *= 10;
+		intPart += str[i] - 48;
+	}
+
+	int point = i;
+	
+	for (i = i + 1; i < len; i++) {
+		fractPart *= 10;
+		fractPart += str[i] - 48;
+	}
+
+	return intPart + (float) fractPart * pow(0.1, len - point);
 }
 
 JSONValue*
@@ -161,9 +235,56 @@ ParseJSON(Buffer buffer) {
 			if (isalnum(c) || c == '.')
 				continue;
 
-			
-			switch (c) {
-			case ',':
+			bool valueFound = false;
+			JSONValue value;
+			// is it bool value?
+			if (strncmp(str + mark, "true", 4) == 0) {
+				value = (JSONValue) {
+					.type = JSON_BOOL,
+					.boolean = true
+				};
+				valueFound = true;
+			}
+
+			if (strncmp(str + mark, "false", 5) == 0) {
+				value = (JSONValue) {
+					.type = JSON_BOOL,
+					.boolean = false
+				};
+				valueFound = true;
+			}
+
+			// is it null?
+			if (strncmp(str + mark, "null", 4) == 0) {
+				value = (JSONValue) {
+					.type = JSON_NULL,
+					.integer = 0,
+				};
+				valueFound = true;
+			}
+
+			// is it integer?
+			if (_isInteger(str, i - mark)) {
+				
+				value = (JSONValue) {
+					.type = JSON_INT,
+					.integer = _ParseInt(str, i - mark)
+				};
+				valueFound = true;
+			}
+
+			// is it float 
+			if (_isFloating(str, i - mark)) {
+				
+				value = (JSONValue) {
+					.type = JSON_FLOAT,
+					.floating = _ParseFloat(str, i - mark)
+				};
+				valueFound = true;
+			}
+
+			if (valueFound) {
+				// TODO: implement
 			}
 		case FIELD_END:
 			if (isspace(c))
