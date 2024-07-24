@@ -27,6 +27,19 @@ _Pop(ArrayList *stack) {
 	return value;
 }
 
+static inline void
+_AppendToTop(ArrayList stack, Buffer key, JSONValue jsonValue) {
+	// we assume that stack is not empty at this stage
+	JSONValue top = _Peek(stack);
+	if (top.type == JSON_OBJECT) {
+		Buffer value = AsBuffer(&jsonValue, sizeof(JSONValue));
+		SLM_Set(&top.object.slm, key, value);
+	} else {
+		// array
+		AL_Add(&top.array.al, &jsonValue);  
+	}
+}
+
 static inline bool
 _isInteger(char *str, size_t len) {
 	if (len == 0)
@@ -217,14 +230,7 @@ ParseJSON(Buffer buffer) {
 					.str = strndup(str + mark, i - mark)
 				};
 
-				JSONValue top = _Peek(stack);
-				if (top.type == JSON_OBJECT) {
-					Buffer value = AsBuffer(&value, sizeof(JSONValue));
-					SLM_Set(&top.object.slm, key, value);
-				} else {
-					// array
-					AL_Add(&top.array.al, &value);  
-				}
+				_AppendToTop(stack, key, value);
 
 				state = FIELD_END;
 				// FALLTHROUGH
@@ -264,28 +270,38 @@ ParseJSON(Buffer buffer) {
 			}
 
 			// is it integer?
-			if (_isInteger(str, i - mark)) {
+			if (_isInteger(str + mark, i - mark)) {
 				
 				value = (JSONValue) {
 					.type = JSON_INT,
-					.integer = _ParseInt(str, i - mark)
+					.integer = _ParseInt(str + mark, i - mark)
 				};
 				valueFound = true;
 			}
 
 			// is it float 
-			if (_isFloating(str, i - mark)) {
+			if (_isFloating(str + mark, i - mark)) {
 				
 				value = (JSONValue) {
 					.type = JSON_FLOAT,
-					.floating = _ParseFloat(str, i - mark)
+					.floating = _ParseFloat(str + mark, i - mark)
 				};
 				valueFound = true;
 			}
 
-			if (valueFound) {
-				// TODO: implement
+			if (!valueFound) {
+				fprintf(stderr, "invalid value: %.*s\n", i - mark, str + mark);
+				goto end;
+
 			}
+
+			if (AL_IsEmpty(stack)) {
+				// shouldn't happen at all
+				printf("stack is empty at VALUE state\n");
+				goto end;
+			}
+
+			_AppendToTop(stack, key, value);
 		case FIELD_END:
 			if (isspace(c))
 				continue;
