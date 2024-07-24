@@ -27,17 +27,37 @@ _Pop(ArrayList *stack) {
 	return value;
 }
 
+
 static inline void
-_AppendToTop(ArrayList stack, Buffer key, JSONValue jsonValue) {
+_PushKey(ArrayList *stack, Buffer key) {
+	AL_Add(stack, &key);	
+}
+
+static inline Buffer
+_PopKey(ArrayList *stack) {
+	Buffer key = *((Buffer *) AL_Get(stack, stack->len - 1));
+	AL_RemoveAt(stack, stack->len - 1);
+	return key;
+}
+
+static inline void
+_AppendToTop(ArrayList stack, ArrayList *keyStack, JSONValue jsonValue) {
 	// we assume that stack is not empty at this stage
 	JSONValue top = _Peek(stack);
 	if (top.type == JSON_OBJECT) {
+		Buffer key = _PopKey(keyStack);
 		Buffer value = AsBuffer(&jsonValue, sizeof(JSONValue));
 		SLM_Set(&top.object.slm, key, value);
 	} else {
 		// array
 		AL_Add(&top.array.al, &jsonValue);  
 	}
+}
+
+static inline void
+_FlattenTop(ArrayList *stack, ArrayList *keyStack) {
+	JSONValue value = _Pop(stack);
+	_AppendToTop(*stack, keyStack, value);
 }
 
 static inline bool
@@ -113,8 +133,8 @@ _ParseFloat(char *str, size_t len) {
 	return intPart + (float) fractPart * pow(0.1, len - point);
 }
 
-JSONValue*
-ParseJSON(Buffer buffer) {
+int
+ParseJSON(Buffer buffer, JSONValue* result) {
 	char *str = buffer.data;
 	size_t len = buffer.len;
 	enum {
@@ -129,8 +149,9 @@ ParseJSON(Buffer buffer) {
 	} state = START;
 
 	ArrayList stack = AllocArrayList(sizeof(JSONValue), 2);
+	ArrayList keyStack = AllocArrayList(sizeof(Buffer), 2);
 	size_t mark = 0;
-	Buffer key;
+	int returnCode = -1;
 
 	for (int i = 0; i < len; i++) {
 		char c = str[i];
@@ -159,7 +180,7 @@ ParseJSON(Buffer buffer) {
 				continue;
 			default:
 				fprintf(stderr, "Unexpected symbol in the beginning: %c\n", str[i]);
-				goto end;
+				goto error;
 			}
 
 		case BEFORE_KEY:
@@ -172,16 +193,16 @@ ParseJSON(Buffer buffer) {
 				continue;
 			default:
 				fprintf(stderr, "Unexpected symbol: %c; expected \"\n", str[i]);
-				goto end;
+				goto error;
 			}
 
 		case KEY:
 			switch (c) {
 			case '\n':
 				fprintf(stderr, "Unexpected newline inside quotes\n");
-				goto end;
+				goto error;
 			case '"':
-				key = AsBuffer(str + mark, i - mark);
+				_PushKey(&keyStack, AsBuffer(str + mark, i - mark));
 				state = COLON;
 				// FALLTHROUGH
 			default:
@@ -196,7 +217,7 @@ ParseJSON(Buffer buffer) {
 				continue;
 			default:
 				fprintf(stderr, "Unexpected symbol: %c; colon (:) expected\n");
-				goto end;
+				goto error;
 			}
 		case BEFORE_VALUE:
 			if (isspace(c))
@@ -206,14 +227,26 @@ ParseJSON(Buffer buffer) {
 				state = STRING_VALUE;
 				continue;
 			case '{':
-				// TODO: object, recursive call
+				JSONObject object = AllocJSONObject();
+				JSONValue value = {
+					.type = JSON_OBJECT,
+					.object = object,
+				};
+
+				_Push(&stack, value);
+				state = BEFORE_KEY;
 				continue;
 			case '[':
-				// TODO: array, function call
+				JSONArray array = AllocJSONArray();
+				value = (JSONValue) {
+					.type = JSON_ARRAY,
+					.array = array
+				};
+				state = BEFORE_VALUE;
 				continue;
 			case ',':
 				fprintf(stderr, "Unexpected comma(,); field value expected\n");
-				goto end;
+				goto error;
 			default:
 				mark = i;
 				state = VALUE;
@@ -223,14 +256,14 @@ ParseJSON(Buffer buffer) {
 			switch (c) {
 			case '\n':
 				fprintf(stderr, "Unexpected newline inside quotes\n");
-				goto end;
+				goto error;
 			case '"':
 				JSONValue value = {
 					.type = JSON_STRING,
 					.str = strndup(str + mark, i - mark)
 				};
 
-				_AppendToTop(stack, key, value);
+				_AppendToTop(stack, &keyStack, value);
 
 				state = FIELD_END;
 				// FALLTHROUGH
@@ -291,30 +324,68 @@ ParseJSON(Buffer buffer) {
 
 			if (!valueFound) {
 				fprintf(stderr, "invalid value: %.*s\n", i - mark, str + mark);
-				goto end;
+				goto error;
 
 			}
 
 			if (AL_IsEmpty(stack)) {
 				// shouldn't happen at all
-				printf("stack is empty at VALUE state\n");
-				goto end;
+				fprintf(stderr, "stack is empty at VALUE state\n");
+				goto error;
 			}
 
-			_AppendToTop(stack, key, value);
+			_AppendToTop(stack, &keyStack, value);
 		case FIELD_END:
 			if (isspace(c))
 				continue;
 			switch (c) {
 			case ',':
-				// TODO:
+				if (_Peek(stack).type == JSON_OBJECT) {
+					state = BEFORE_KEY;
+				} else {
+					// array
+					state = BEFORE_VALUE;
+				}
+				continue;
+			case '}':
+				if (_Peek(stack).type != JSON_OBJECT) {
+					fprintf(stderr, "unexpected token } (should it be ]?) \n");
+					goto error;
+				}
+
+				if (stack.len == 1) {
+					// it is the end, congrats!
+					goto success;
+				} 
+
+				_FlattenTop(&stack, &keyStack);
+			case ']':
+				if (_Peek(stack).type != JSON_ARRAY) {
+					fprintf(stderr, "unexpected token ] (should it be }?) \n");
+					goto error;
+				}
+
+				if (stack.len == 1) {
+					// it is the end, congrats!
+					goto success;
+				} 
+
+				_FlattenTop(&stack, &keyStack);
 			}
 
 		}
 	}
 
-end:
+
+success:
+	*result	= _Pop(&stack);
+	returnCode = 0;
+error:
 	// TODO: free all objects, arrays and strings in stack!
+	for (int i = 0; i < stack.len; i++) {
+		// TODO: free JSON Value
+	}
 	FreeArrayList(&stack);
-	return NULL;
+
+	return returnCode;
 }

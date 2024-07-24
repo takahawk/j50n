@@ -89,6 +89,6 @@ FreeJSONObject(JSONObject*);
 
 
 // parse functions
-JSONValue*
-ParseJSON(Buffer);
+int
+ParseJSON(Buffer, JSONValue*);
 #endif
