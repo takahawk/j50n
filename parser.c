@@ -17,7 +17,7 @@ _Push(ArrayList *stack, JSONValue value) {
 
 static inline JSONValue
 _Peek(ArrayList stack) {
-	return *((JSONValue*) AL_Get(&stack, stack.len - 1));
+	return *((JSONValue*) AL_Get(stack, stack.len - 1));
 }
 
 static inline JSONValue
@@ -35,7 +35,7 @@ _PushKey(ArrayList *stack, Buffer key) {
 
 static inline Buffer
 _PopKey(ArrayList *stack) {
-	Buffer key = *((Buffer *) AL_Get(stack, stack->len - 1));
+	Buffer key = *((Buffer *) AL_Get(*stack, stack->len - 1));
 	AL_RemoveAt(stack, stack->len - 1);
 	return key;
 }
@@ -133,7 +133,7 @@ _ParseFloat(char *str, size_t len) {
 	return intPart + (float) fractPart * pow(0.1, len - point);
 }
 
-int
+bool
 ParseJSON(Buffer buffer, JSONValue* result) {
 	char *str = buffer.data;
 	size_t len = buffer.len;
@@ -151,7 +151,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 	ArrayList stack = AllocArrayList(sizeof(JSONValue), 2);
 	ArrayList keyStack = AllocArrayList(sizeof(Buffer), 2);
 	size_t mark = 0;
-	int returnCode = -1;
+	bool success = false;
 
 	for (int i = 0; i < len; i++) {
 		char c = str[i];
@@ -379,13 +379,14 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 
 success:
 	*result	= _Pop(&stack);
-	returnCode = 0;
+	FreeArrayList(&stack);
+	return true;
 error:
-	// TODO: free all objects, arrays and strings in stack!
-	for (int i = 0; i < stack.len; i++) {
-		// TODO: free JSON Value
+	while (stack.len != 0) {
+		JSONValue value = _Pop(&stack);
+		FreeJSONValue(&value);
 	}
 	FreeArrayList(&stack);
 
-	return returnCode;
+	return false;
 }

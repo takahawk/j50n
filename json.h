@@ -92,6 +92,6 @@ void
 FreeJSONValue(JSONValue*);
 
 // parse functions
-int
+bool
 ParseJSON(Buffer, JSONValue*);
 #endif
