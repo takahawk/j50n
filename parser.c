@@ -225,6 +225,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				continue;
 			switch (c) {
 			case '"':
+				mark = i + 1;
 				state = STRING_VALUE;
 				continue;
 			case '{':
@@ -336,6 +337,8 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 			}
 
 			_AppendToTop(stack, &keyStack, value);
+			state = FIELD_END;
+			continue;
 		case FIELD_END:
 			if (isspace(c))
 				continue;
