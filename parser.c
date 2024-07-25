@@ -45,7 +45,7 @@ _AppendToTop(ArrayList stack, ArrayList *keyStack, JSONValue jsonValue) {
 	// we assume that stack is not empty at this stage
 	JSONValue top = _Peek(stack);
 	if (top.type == JSON_OBJECT) {
-		Buffer key = _PopKey(keyStack);
+		Buffer key = B_Copy(_PopKey(keyStack));
 		Buffer value = AsBuffer(&jsonValue, sizeof(JSONValue));
 		SLM_Set(&top.object.slm, key, value);
 	} else {
@@ -176,6 +176,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 					.type = JSON_ARRAY,
 					.array = array
 				};
+				_Push(&stack, value);
 				state = BEFORE_VALUE;
 				continue;
 			default:
