@@ -1,0 +1,17 @@
+[
+{ "text": "Implement swapping adjacent elements", "done": true },
+{ "text": "Add todo item structure", "done": true },
+{ "text": "Add rendering with a checkbox", "done": true },
+{ "text": "Add highlighting of selected point", "done": true },
+{ "text": "Cursor moves", "done": true },
+{ "text": "Implement toggling checkbox", "done": true },
+{ "text": "Implement saving to JSON (simple version)", "done": true },
+{ "text": "Implement loading from JSON (simple version)", "done": true },
+{ "text": "Create separate repo for data structures", "done": true },
+{ "text": "Use array list for todo items", "done": true },
+{ "text": "Implement adding new todo item", "done": true },
+{ "text": "Add alloc/free functions for todoitem", "done": false },
+{ "text": "Create map data structure using skip list (hashes are too deep for now) and we need it now", "done": false },
+{ "text": "Implement possibility to edit entries", "done": false },
+{ "text": "Make adding new item more sweet (dialog window?)", "done": false }
+]
