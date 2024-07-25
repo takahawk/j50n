@@ -94,4 +94,13 @@ FreeJSONValue(JSONValue*);
 // parse functions
 bool
 ParseJSON(Buffer, JSONValue*);
+
+// encoding functions
+// describe internal structure of parsed JSON, with types
+void
+JV_Describe(JSONValue,Buffer*);
+
+// encodes JSON structure to JSON string
+void
+JV_Stringify(JSONValue,Buffer*);
 #endif

@@ -18,3 +18,18 @@ FreeJSONValue(JSONValue* value) {
 		// do nothing
 	}
 }
+
+void
+JV_Describe(JSONValue value, Buffer* buffer) {
+	// TODO:
+	switch (value.type) {
+	}
+}
+
+// encodes JSON structure to JSON string
+void
+JV_Stringify(JSONValue value, Buffer* buffer) {
+	// TODO:
+	switch (value.type) {
+	}
+}
