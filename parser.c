@@ -46,7 +46,7 @@ _AppendToTop(ArrayList stack, ArrayList *keyStack, JSONValue jsonValue) {
 	JSONValue top = _Peek(stack);
 	if (top.type == JSON_OBJECT) {
 		Buffer key = B_Copy(_PopKey(keyStack));
-		Buffer value = AsBuffer(&jsonValue, sizeof(JSONValue));
+		Buffer value = B_As(&jsonValue, sizeof(JSONValue));
 		SLM_Set(&top.object.slm, key, value);
 	} else {
 		// array
@@ -203,7 +203,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				fprintf(stderr, "Unexpected newline inside quotes\n");
 				goto error;
 			case '"':
-				_PushKey(&keyStack, AsBuffer(str + mark, i - mark));
+				_PushKey(&keyStack, B_As(str + mark, i - mark));
 				state = COLON;
 				// FALLTHROUGH
 			default:

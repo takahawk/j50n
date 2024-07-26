@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-I. -I./d4t4-5tructur35 -I./ut1l5 $(if $(NODEBUG),,-g)
 LIBS=-lm
 DEPS=json.h
-DATA_STRUCTURES=array_list.o buffer.o skip_list_map.o 
+DATA_STRUCTURES=array_list.o skip_list_map.o 
 UTILS=files.o
 OBJ=array.o object.o value.o parser.o $(patsubst %,d4t4-5tructur35/%,$(DATA_STRUCTURES)) $(patsubst %,ut1l5/%,$(UTILS))
 

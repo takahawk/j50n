@@ -18,7 +18,7 @@ AllocJSONObject() {
 JSONValue
 JO_GetValue(char* key, JSONObject o) {
 	size_t keylen = strlen(key);
-	Buffer value = SLM_Get(o.slm, AsBuffer(key, keylen));
+	Buffer value = SLM_Get(o.slm, B_As(key, keylen));
 	return *((JSONValue *) value.data);
 }
 
