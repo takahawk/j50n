@@ -18,7 +18,7 @@ AllocJSONObject() {
 JSONValue
 JO_GetValue(char* key, JSONObject o) {
 	size_t keylen = strlen(key);
-	Buffer value = SLM_Get(o.slm, B_As(key, keylen));
+	Buffer value = SLM_Get(o.slm, B_Wrap(key, keylen));
 	return *((JSONValue *) value.data);
 }
 
@@ -67,13 +67,12 @@ JO_GetFloat(char* key, JSONObject o) {
 	return value.floating;
 }
 
-
-char*
+String
 JO_GetString(char* key, JSONObject o) {
 	JSONValue value = JO_GetValue(key, o);
 	if (value.type != JSON_STRING) {
 		fprintf(stderr, "Value by key %s is not a string\n", key);
-		return 0;
+		return S_Null(); 
 	}
 
 	return value.str;
@@ -91,13 +90,13 @@ JO_GetBoolean(char* key, JSONObject o) {
 }
 
 static void
-_FreeObjectField(Buffer key, Buffer value) {
+_FreeObjectField(Buffer key, Buffer value, void* arg) {
 	JSONValue *jsonValue = ((JSONValue*) value.data);
 	FreeJSONValue(jsonValue);
 }
 
 void
 FreeJSONObject(JSONObject *o) {
-	SLM_Iterate(o->slm, _FreeObjectField);
+	SLM_Iterate(o->slm, _FreeObjectField, NULL);
 	SLM_Free(&o->slm);
 }

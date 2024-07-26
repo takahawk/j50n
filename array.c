@@ -65,13 +65,12 @@ JA_GetFloat(int i, JSONArray a) {
 	return value.floating;
 }
 
-
-char*
+String
 JA_GetString(int i, JSONArray a) {
 	JSONValue value = JA_GetValue(i, a);
 	if (value.type != JSON_STRING) {
 		fprintf(stderr, "Value at index %d is not a string\n", i);
-		return 0;
+		return S_Null(); 
 	}
 
 	return value.str;
@@ -89,14 +88,13 @@ JA_GetBoolean(int i, JSONArray a) {
 }
 
 static void
-_FreeJSONArrayElem(void *elem) {
+_FreeJSONArrayElem(size_t i, void *elem, void *arg) {
 	JSONValue *value = ((JSONValue*) elem);
 	FreeJSONValue(value);
 }
 
 void
 FreeJSONArray(JSONArray* a) {
-	AL_Iterate(a->al, _FreeJSONArrayElem);
+	AL_Iterate(a->al, _FreeJSONArrayElem, NULL);
 	FreeArrayList(&a->al);
-	// TODO: implement recursive freeing of inner objects and arrays
 }

@@ -46,7 +46,7 @@ _AppendToTop(ArrayList stack, ArrayList *keyStack, JSONValue jsonValue) {
 	JSONValue top = _Peek(stack);
 	if (top.type == JSON_OBJECT) {
 		Buffer key = B_Copy(_PopKey(keyStack));
-		Buffer value = B_As(&jsonValue, sizeof(JSONValue));
+		Buffer value = B_Wrap(&jsonValue, sizeof(JSONValue));
 		SLM_Set(&top.object.slm, key, value);
 	} else {
 		// array
@@ -160,6 +160,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 			if (isspace(c))
 				continue;
 			switch (c) {
+			// TODO: clang not working here. mb refactor
 			case '{':
 				JSONObject object = AllocJSONObject();
 				JSONValue value = {
@@ -203,7 +204,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				fprintf(stderr, "Unexpected newline inside quotes\n");
 				goto error;
 			case '"':
-				_PushKey(&keyStack, B_As(str + mark, i - mark));
+				_PushKey(&keyStack, B_Wrap(str + mark, i - mark));
 				state = COLON;
 				// FALLTHROUGH
 			default:
@@ -262,7 +263,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 			case '"':
 				JSONValue value = {
 					.type = JSON_STRING,
-					.str = strndup(str + mark, i - mark)
+					.str = S_CopyN(str + mark, i - mark)
 				};
 
 				_AppendToTop(stack, &keyStack, value);

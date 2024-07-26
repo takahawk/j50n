@@ -4,6 +4,7 @@
 
 #include "d4t4-5tructur35/array_list.h"
 #include "d4t4-5tructur35/skip_list_map.h"
+#include "d4t4-5tructur35/string_.h"
 
 typedef enum {
 	JSON_INT,
@@ -14,7 +15,6 @@ typedef enum {
 	JSON_ARRAY,
 	JSON_NULL
 } JSONValueType;
-
 
 typedef struct {
 	SkipListMap slm;
@@ -28,7 +28,7 @@ typedef struct {
 	JSONValueType type;
 	union {
 		int integer;
-		char *str;
+		String str;
 		float floating;
 		bool boolean;
 		JSONObject object;
@@ -53,7 +53,7 @@ JA_GetArray(int, JSONArray);
 int
 JA_GetInt(int, JSONArray);
 
-char*
+String
 JA_GetString(int, JSONArray);
 
 bool
@@ -78,7 +78,7 @@ JO_GetArray(char*, JSONObject);
 int
 JO_GetInt(char*, JSONObject);
 
-char*
+String
 JO_GetString(char*, JSONObject);
 
 bool
@@ -97,10 +97,16 @@ ParseJSON(Buffer, JSONValue*);
 
 // encoding functions
 // describe internal structure of parsed JSON, with types
+Buffer
+JV_Describe(JSONValue);
+
 void
-JV_Describe(JSONValue,Buffer*);
+JV_DescribeToBuffer(JSONValue,Buffer*);
 
 // encodes JSON structure to JSON string
+Buffer
+JV_Stringify(JSONValue);
+
 void
-JV_Stringify(JSONValue,Buffer*);
+JV_StringifyToBuffer(JSONValue,Buffer*);
 #endif
