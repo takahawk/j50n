@@ -7,13 +7,13 @@
 #include "d4t4-5tructur35/string_.h"
 
 typedef enum {
+	JSON_NULL,
 	JSON_INT,
 	JSON_STRING,
 	JSON_FLOAT,
 	JSON_BOOL,
 	JSON_OBJECT,
-	JSON_ARRAY,
-	JSON_NULL
+	JSON_ARRAY
 } JSONValueType;
 
 typedef struct {

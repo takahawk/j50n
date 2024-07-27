@@ -15,14 +15,14 @@ _Push(ArrayList *stack, JSONValue value) {
 	AL_Add(stack, &value);	
 }
 
-static inline JSONValue
+static inline JSONValue*
 _Peek(ArrayList stack) {
-	return *((JSONValue*) AL_Get(stack, stack.len - 1));
+	return (JSONValue*) AL_Get(stack, stack.len - 1);
 }
 
 static inline JSONValue
 _Pop(ArrayList *stack) {
-	JSONValue value = _Peek(*stack);
+	JSONValue value = *_Peek(*stack);
 	AL_RemoveAt(stack, stack->len - 1);
 	return value;
 }
@@ -43,14 +43,14 @@ _PopKey(ArrayList *stack) {
 static inline void
 _AppendToTop(ArrayList stack, ArrayList *keyStack, JSONValue jsonValue) {
 	// we assume that stack is not empty at this stage
-	JSONValue top = _Peek(stack);
-	if (top.type == JSON_OBJECT) {
+	JSONValue *top = _Peek(stack);
+	if (top->type == JSON_OBJECT) {
 		Buffer key = B_Copy(_PopKey(keyStack));
 		Buffer value = B_Wrap(&jsonValue, sizeof(JSONValue));
-		SLM_Set(&top.object.slm, key, value);
+		SLM_Set(&top->object.slm, key, value);
 	} else {
 		// array
-		AL_Add(&top.array.al, &jsonValue);  
+		AL_Add(&top->array.al, &jsonValue);  
 	}
 }
 
@@ -342,7 +342,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				continue;
 			switch (c) {
 			case ',':
-				if (_Peek(stack).type == JSON_OBJECT) {
+				if (_Peek(stack)->type == JSON_OBJECT) {
 					state = BEFORE_KEY;
 				} else {
 					// array
@@ -350,7 +350,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				}
 				continue;
 			case '}':
-				if (_Peek(stack).type != JSON_OBJECT) {
+				if (_Peek(stack)->type != JSON_OBJECT) {
 					fprintf(stderr, "unexpected token } (should it be ]?) \n");
 					goto error;
 				}
@@ -361,8 +361,9 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				} 
 
 				_FlattenTop(&stack, &keyStack);
+				continue;
 			case ']':
-				if (_Peek(stack).type != JSON_ARRAY) {
+				if (_Peek(stack)->type != JSON_ARRAY) {
 					fprintf(stderr, "unexpected token ] (should it be }?) \n");
 					goto error;
 				}
@@ -373,6 +374,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				} 
 
 				_FlattenTop(&stack, &keyStack);
+				continue;
 			}
 
 		}
