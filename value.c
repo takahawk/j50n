@@ -35,11 +35,11 @@ typedef struct {
 	bool isFirst;
 	int depth;
 	ResizableBuffer *rb;
-} _CB_SLM_Args;
+} _CB_Args;
 
 static void
-_CB_SLM_Describe(Buffer key, Buffer value, void* args) {
-	_CB_SLM_Args* cbArgs = (_CB_SLM_Args*) args;
+_CB_AL_Describe(size_t index, void* value, void* args) {
+	_CB_Args* cbArgs = (_CB_Args*) args;
 	ResizableBuffer *rb = (ResizableBuffer*) cbArgs->rb;
 		
 	if (!cbArgs->isFirst) {
@@ -47,7 +47,25 @@ _CB_SLM_Describe(Buffer key, Buffer value, void* args) {
 		cbArgs->isFirst = false;
 	}
 
-	// TODO: mb add char* append variant to resizable buffer?
+	RB_Append(rb, "\n");
+	for (int i = 0; i < cbArgs->depth; i++) {
+		RB_Append(rb, "\t");
+	}
+
+	JSONValue jsonValue = *((JSONValue*) value);
+	_DescribeToResizableBuffer(jsonValue, rb, cbArgs->depth + 1);
+}
+
+static void
+_CB_SLM_Describe(Buffer key, Buffer value, void* args) {
+	_CB_Args* cbArgs = (_CB_Args*) args;
+	ResizableBuffer *rb = (ResizableBuffer*) cbArgs->rb;
+		
+	if (!cbArgs->isFirst) {
+		RB_Append(rb, ", ");
+		cbArgs->isFirst = false;
+	}
+
 	RB_Append(rb, "\n");
 	for (int i = 0; i < cbArgs->depth; i++) {
 		RB_Append(rb, "\t");
@@ -71,14 +89,20 @@ _DescribeToResizableBuffer(JSONValue value, ResizableBuffer* rb, int depth) {
 		RB_Append(rb, "\"");
 		break;
 	case JSON_INT:
+		RB_Append(rb, "(int) ");
+		RB_Append(rb, S_From(value.integer));
 		break;
 	case JSON_FLOAT:
+		RB_Append(rb, "(float) ");
+		RB_Append(rb, S_From(value.floating));
 		break;
 	case JSON_BOOL:
+		RB_Append(rb, "(bool) ");
+		RB_Append(rb, S_From(value.boolean));
 		break;
 	case JSON_OBJECT:
 		RB_Append(rb, "(object) {");
-		_CB_SLM_Args args = {
+		_CB_Args args = {
 			.isFirst = true,
 			.rb = rb,
 			.depth = depth
@@ -87,6 +111,14 @@ _DescribeToResizableBuffer(JSONValue value, ResizableBuffer* rb, int depth) {
 		RB_Append(rb, "}\n");
 		break;
 	case JSON_ARRAY:
+		RB_Append(rb, "(array) {");
+		args = (_CB_Args) {
+			.isFirst = true,
+			.rb = rb,
+			.depth = depth
+		};
+		AL_Iterate(value.array.al, _CB_AL_Describe, &args);
+		RB_Append(rb, "}\n");
 		break;
 	case JSON_NULL:
 		RB_Append(rb, "null");

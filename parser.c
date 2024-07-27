@@ -277,7 +277,6 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 			if (isalnum(c) || c == '.')
 				continue;
 
-			bool valueFound = false;
 			JSONValue value;
 			// is it bool value?
 			if (strncmp(str + mark, "true", 4) == 0) {
@@ -285,7 +284,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 					.type = JSON_BOOL,
 					.boolean = true
 				};
-				valueFound = true;
+				goto valueFound;
 			}
 
 			if (strncmp(str + mark, "false", 5) == 0) {
@@ -293,7 +292,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 					.type = JSON_BOOL,
 					.boolean = false
 				};
-				valueFound = true;
+				goto valueFound;
 			}
 
 			// is it null?
@@ -302,7 +301,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 					.type = JSON_NULL,
 					.integer = 0,
 				};
-				valueFound = true;
+				goto valueFound;
 			}
 
 			// is it integer?
@@ -312,7 +311,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 					.type = JSON_INT,
 					.integer = _ParseInt(str + mark, i - mark)
 				};
-				valueFound = true;
+				goto valueFound;
 			}
 
 			// is it float 
@@ -322,15 +321,13 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 					.type = JSON_FLOAT,
 					.floating = _ParseFloat(str + mark, i - mark)
 				};
-				valueFound = true;
+				goto valueFound;
 			}
 
-			if (!valueFound) {
-				fprintf(stderr, "invalid value: %.*s\n", i - mark, str + mark);
-				goto error;
+			fprintf(stderr, "invalid value: %.*s\n", i - mark, str + mark);
+			goto error;
 
-			}
-
+		valueFound:
 			if (AL_IsEmpty(stack)) {
 				// shouldn't happen at all
 				fprintf(stderr, "stack is empty at VALUE state\n");

@@ -23,8 +23,10 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-	// TODO: printing!
+	String described = S_From(JV_Describe(parsedJSON));
+	printf(described.str);
 
+	// TODO: memory cleanup!
 	return 0;
 }
 
