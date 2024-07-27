@@ -44,6 +44,7 @@ _CB_AL_Describe(size_t index, void* value, void* args) {
 		
 	if (!cbArgs->isFirst) {
 		RB_Append(rb, ", ");
+	} else {
 		cbArgs->isFirst = false;
 	}
 
@@ -53,7 +54,7 @@ _CB_AL_Describe(size_t index, void* value, void* args) {
 	}
 
 	JSONValue jsonValue = *((JSONValue*) value);
-	_DescribeToResizableBuffer(jsonValue, rb, cbArgs->depth + 1);
+	_DescribeToResizableBuffer(jsonValue, rb, cbArgs->depth);
 }
 
 static void
@@ -63,6 +64,7 @@ _CB_SLM_Describe(Buffer key, Buffer value, void* args) {
 		
 	if (!cbArgs->isFirst) {
 		RB_Append(rb, ", ");
+	} else {
 		cbArgs->isFirst = false;
 	}
 
@@ -76,7 +78,7 @@ _CB_SLM_Describe(Buffer key, Buffer value, void* args) {
 	RB_Append(rb, ": ");
 
 	JSONValue jsonValue = *((JSONValue*) value.data);
-	_DescribeToResizableBuffer(jsonValue, rb, cbArgs->depth + 1);
+	_DescribeToResizableBuffer(jsonValue, rb, cbArgs->depth);
 }
 
 static void
@@ -105,20 +107,26 @@ _DescribeToResizableBuffer(JSONValue value, ResizableBuffer* rb, int depth) {
 		_CB_Args args = {
 			.isFirst = true,
 			.rb = rb,
-			.depth = depth
+			.depth = depth + 1
 		};
 		SLM_Iterate(value.object.slm, _CB_SLM_Describe, &args);
-		RB_Append(rb, "}\n");
+		RB_Append(rb, "\n");
+		for (int i = 0; i < depth; i++)
+			RB_Append(rb, "\t");
+		RB_Append(rb, "}");
 		break;
 	case JSON_ARRAY:
-		RB_Append(rb, "(array) {");
+		RB_Append(rb, "(array) [");
 		args = (_CB_Args) {
 			.isFirst = true,
 			.rb = rb,
-			.depth = depth
+			.depth = depth + 1
 		};
 		AL_Iterate(value.array.al, _CB_AL_Describe, &args);
-		RB_Append(rb, "}\n");
+		RB_Append(rb, "\n");
+		for (int i = 0; i < depth; i++)
+			RB_Append(rb, "\t");
+		RB_Append(rb, "]");
 		break;
 	case JSON_NULL:
 		RB_Append(rb, "null");
