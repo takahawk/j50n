@@ -3,9 +3,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#include "d4t4-5tructur35/buffer.h"
-#include "d4t4-5tructur35/resizable_buffer.h"
-#include "d4t4-5tructur35/string_.h"
+#include "w/d4t4-5tructur35/buffer.h"
+#include "w/d4t4-5tructur35/resizable_buffer.h"
+#include "w/d4t4-5tructur35/string_.h"
 
 #define JSON_BUFFER_CAPACITY 1000
 

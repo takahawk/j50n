@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "d4t4-5tructur35/array_list.h"
-#include "d4t4-5tructur35/buffer.h"
-#include "d4t4-5tructur35/skip_list_map.h"
+#include "w/d4t4-5tructur35/array_list.h"
+#include "w/d4t4-5tructur35/buffer.h"
+#include "w/d4t4-5tructur35/skip_list_map.h"
 
 static inline void
 _Push(ArrayList *stack, JSONValue value) {

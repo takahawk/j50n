@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "d4t4-5tructur35/array_list.h"
+#include "w/d4t4-5tructur35/array_list.h"
 
 #define AL_INITIAL_CAPACITY 10
 

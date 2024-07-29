@@ -1,21 +1,24 @@
 CC ?= gcc
-CFLAGS = -I. -I./d4t4-5tructur35 -I./ut1l5 $(if $(NODEBUG),,-g)
-LIBS = -lm
-DEPS = json.h
-DATA_STRUCTURES=array_list.o skip_list_map.o 
-UTILS=files.o
-OBJ=array.o object.o value.o parser.o $(patsubst %,d4t4-5tructur35/%,$(DATA_STRUCTURES)) $(patsubst %,ut1l5/%,$(UTILS))
+CFLAGS = -Wl,-rpath,/usr/local/lib -I. $(if $(NODEBUG),,-g)
+LIBS = -lm -ld4t4-5tructur35 -lut1l5
 
-ifeq ($(CC), clang)
-	CFLAGS := $(CFLAGS) -std=c17 -v
-endif
+SRC = array.c object.c parser.c value.c
+OBJ = $(SRC:.c=.o)
+HEADER = json.h
 
-bin/describe: $(OBJ) cmd/describe.o
-	echo $(CFLAGS)
-	mkdir -p bin/
+SHARED_LIB = bin/libj50n.so
+DESCRIBE_BIN = bin/describe
+
+$(DESCRIBE_BIN): $(OBJ) cmd/describe.o
+	mkdir -p bin
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-%.o: %.c $(DEPS)
+
+$(SHARED_LIB): $(OBJ)
+	mkdir -p bin
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+%.o: %.c 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 ut1l5/files.o: ut1l5/files.c
@@ -27,5 +30,3 @@ d4t4-5tructur35/%.o: d4t4-5tructur35/%.c
 
 clean:
 	rm -rf *.o
-	$(MAKE) -C d4t4-5tructur35 clean
-	$(MAKE) -C ut1l5 clean
