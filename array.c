@@ -10,7 +10,7 @@
 JSONArray
 AllocJSONArray() {
 	JSONArray a;
-	a.al = AllocArrayList(sizeof(JSONValue), AL_INITIAL_CAPACITY);
+	a.al = AL_Alloc(sizeof(JSONValue), AL_INITIAL_CAPACITY);
 	return a;
 }
 
@@ -96,5 +96,5 @@ _FreeJSONArrayElem(size_t i, void *elem, void *arg) {
 void
 FreeJSONArray(JSONArray* a) {
 	AL_Iterate(a->al, _FreeJSONArrayElem, NULL);
-	FreeArrayList(&a->al);
+	AL_Free(&a->al);
 }

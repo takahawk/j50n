@@ -43,11 +43,6 @@ $(STATIC_LIB): $(OBJ)
 %_pic.o: %.c
 	$(CC) -fPIC -c -o $@ $< $(CFLAGS) -fPIC
 
-ut1l5/files.o: ut1l5/files.c
-	$(MAKE) -C ut1l5 $(UTILS)
-
-d4t4-5tructur35/%.o: d4t4-5tructur35/%.c
-	$(MAKE) -C d4t4-5tructur35 $(DATA_STRUCTURES)
 
 install:
 	mkdir -p $(INSTALL_INCLUDE_DIR) 

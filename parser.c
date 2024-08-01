@@ -148,8 +148,8 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 		FIELD_END,
 	} state = START;
 
-	ArrayList stack = AllocArrayList(sizeof(JSONValue), 2);
-	ArrayList keyStack = AllocArrayList(sizeof(Buffer), 2);
+	ArrayList stack = AL_Alloc(sizeof(JSONValue), 2);
+	ArrayList keyStack = AL_Alloc(sizeof(Buffer), 2);
 	size_t mark = 0;
 	bool success = false;
 
@@ -383,14 +383,14 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 
 success:
 	*result	= _Pop(&stack);
-	FreeArrayList(&stack);
+	AL_Free(&stack);
 	return true;
 error:
 	while (stack.len != 0) {
 		JSONValue value = _Pop(&stack);
 		FreeJSONValue(&value);
 	}
-	FreeArrayList(&stack);
+	AL_Free(&stack);
 
 	return false;
 }
