@@ -162,7 +162,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 			switch (c) {
 			// TODO: clang not working here. mb refactor
 			case '{':
-				JSONObject object = AllocJSONObject();
+				JSONObject object = JO_Alloc();
 				JSONValue value = {
 					.type = JSON_OBJECT,
 					.object = object,
@@ -172,7 +172,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				state = BEFORE_KEY;
 				continue;
 			case '[':
-				JSONArray array = AllocJSONArray();
+				JSONArray array = JA_Alloc();
 				value = (JSONValue) {
 					.type = JSON_ARRAY,
 					.array = array
@@ -230,7 +230,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				state = STRING_VALUE;
 				continue;
 			case '{':
-				JSONObject object = AllocJSONObject();
+				JSONObject object = JO_Alloc();
 				JSONValue value = {
 					.type = JSON_OBJECT,
 					.object = object,
@@ -240,7 +240,7 @@ ParseJSON(Buffer buffer, JSONValue* result) {
 				state = BEFORE_KEY;
 				continue;
 			case '[':
-				JSONArray array = AllocJSONArray();
+				JSONArray array = JA_Alloc();
 				value = (JSONValue) {
 					.type = JSON_ARRAY,
 					.array = array
@@ -388,7 +388,7 @@ success:
 error:
 	while (stack.len != 0) {
 		JSONValue value = _Pop(&stack);
-		FreeJSONValue(&value);
+		JV_Free(&value);
 	}
 	AL_Free(&stack);
 

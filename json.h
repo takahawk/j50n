@@ -39,7 +39,7 @@ typedef struct {
 // array getters
 
 JSONArray
-AllocJSONArray();
+JA_Alloc();
 
 JSONValue
 JA_GetValue(int, JSONArray);
@@ -60,11 +60,11 @@ bool
 JA_GetBoolean(int, JSONArray);
 
 void
-FreeJSONArray(JSONArray*);
+JA_Free(JSONArray*);
 
 // object getters
 JSONObject
-AllocJSONObject();
+JO_Alloc();
 
 JSONValue
 JO_GetValue(char*, JSONObject);
@@ -85,11 +85,11 @@ bool
 JO_GetBoolean(char*, JSONObject);
 
 void
-FreeJSONObject(JSONObject*);
+JO_Free(JSONObject*);
 
 // value functions
 void
-FreeJSONValue(JSONValue*);
+JV_Free(JSONValue*);
 
 // parse functions
 bool

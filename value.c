@@ -10,13 +10,13 @@
 #define JSON_BUFFER_CAPACITY 1000
 
 void
-FreeJSONValue(JSONValue* value) {
+JV_Free(JSONValue* value) {
 	switch (value->type) {
 	case JSON_OBJECT:
-		FreeJSONObject(&value->object);
+		JO_Free(&value->object);
 		return;
 	case JSON_ARRAY:
-		FreeJSONArray(&value->array);
+		JA_Free(&value->array);
 		return;
 	case JSON_STRING:
 		S_Free(&value->str);

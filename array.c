@@ -8,7 +8,7 @@
 #define AL_INITIAL_CAPACITY 10
 
 JSONArray
-AllocJSONArray() {
+JA_Alloc() {
 	JSONArray a;
 	a.al = AL_Alloc(sizeof(JSONValue), AL_INITIAL_CAPACITY);
 	return a;
@@ -90,11 +90,11 @@ JA_GetBoolean(int i, JSONArray a) {
 static void
 _FreeJSONArrayElem(size_t i, void *elem, void *arg) {
 	JSONValue *value = ((JSONValue*) elem);
-	FreeJSONValue(value);
+	JV_Free(value);
 }
 
 void
-FreeJSONArray(JSONArray* a) {
+JA_Free(JSONArray* a) {
 	AL_Iterate(a->al, _FreeJSONArrayElem, NULL);
 	AL_Free(&a->al);
 }

@@ -9,7 +9,7 @@
 #include "w/d4t4-5tructur35/skip_list_map.h"
 
 JSONObject
-AllocJSONObject() {
+JO_Alloc() {
 	JSONObject o;
 	o.slm = SLM_Create();
 	return o;
@@ -92,11 +92,11 @@ JO_GetBoolean(char* key, JSONObject o) {
 static void
 _FreeObjectField(Buffer key, Buffer value, void* arg) {
 	JSONValue *jsonValue = ((JSONValue*) value.data);
-	FreeJSONValue(jsonValue);
+	JV_Free(jsonValue);
 }
 
 void
-FreeJSONObject(JSONObject *o) {
+JO_Free(JSONObject *o) {
 	SLM_Iterate(o->slm, _FreeObjectField, NULL);
 	SLM_Free(&o->slm);
 }
