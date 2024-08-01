@@ -15,10 +15,13 @@ SHARED_LIB = bin/libj50n.so
 STATIC_LIB = bin/libj50n.a
 DESCRIBE_BIN = bin/describe
 
-.PHONY: all clean shared static install
+.PHONY: all check clean shared static install
 .DEFAULT_GOAL = all
 
 all: $(DESCRIBE_BIN) shared static
+
+check:
+	$(CC) -fsyntax-only $(SRC) $(HEADER)
 
 shared: $(SHARED_LIB)
 

@@ -41,6 +41,9 @@ typedef struct {
 JSONArray
 JA_Alloc();
 
+static inline void
+JA_AddValue(JSONArray*, JSONValue);
+
 JSONValue
 JA_GetValue(int, JSONArray);
 
@@ -65,6 +68,9 @@ JA_Free(JSONArray*);
 // object getters
 JSONObject
 JO_Alloc();
+
+static inline void
+JO_AddValue(JSONObject*, String, JSONValue);
 
 JSONValue
 JO_GetValue(char*, JSONObject);
@@ -109,4 +115,15 @@ JV_Stringify(JSONValue);
 
 void
 JV_StringifyToBuffer(JSONValue,Buffer*);
+
+
+static inline void
+JA_AddValue(JSONArray *a, JSONValue v) {
+	AL_Add(&a->al, &v);
+}
+
+static inline void
+JO_AddValue(JSONObject *o, String s, JSONValue v) {
+	SLM_Set(&o->slm, B_Wrap(s.str, s.len), B_Wrap(&v, sizeof(v)));
+}
 #endif
