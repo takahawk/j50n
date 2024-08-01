@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 	Buffer json = uF_ReadFileByName(filename);
 	JSONValue parsedJSON;
 
-	if (!ParseJSON(json, &parsedJSON)) {
+	if (!JSON_Parse(json, &parsedJSON)) {
 		fprintf(stderr, "error parsing JSON\n");
 		return -1;
 	}

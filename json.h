@@ -99,7 +99,7 @@ JV_Free(JSONValue*);
 
 // parse functions
 bool
-ParseJSON(Buffer, JSONValue*);
+JSON_Parse(Buffer, JSONValue*);
 
 // encoding functions
 // describe internal structure of parsed JSON, with types

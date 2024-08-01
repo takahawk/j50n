@@ -134,7 +134,7 @@ _ParseFloat(char *str, size_t len) {
 }
 
 bool
-ParseJSON(Buffer buffer, JSONValue* result) {
+JSON_Parse(Buffer buffer, JSONValue* result) {
 	char *str = buffer.data;
 	size_t len = buffer.len;
 	enum {
