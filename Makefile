@@ -51,7 +51,7 @@ install:
 	mkdir -p $(INSTALL_INCLUDE_DIR) 
 	mkdir -p $(INSTALL_SRC_DIR) 
 	mkdir -p $(INSTALL_LIB_DIR)
-	for header in $(HEADERS); do \
+	for header in $(HEADER); do \
 	       cp $$header $(INSTALL_INCLUDE_DIR) ; \
 	done
 	

@@ -123,7 +123,7 @@ JA_AddValue(JSONArray *a, JSONValue v) {
 }
 
 static inline void
-JO_AddValue(JSONObject *o, String s, JSONValue v) {
+JO_SetValue(JSONObject *o, String s, JSONValue v) {
 	SLM_Set(&o->slm, B_Wrap(s.str, s.len), B_Wrap(&v, sizeof(v)));
 }
 #endif
